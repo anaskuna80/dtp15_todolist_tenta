@@ -1,6 +1,6 @@
 ﻿namespace dtp15_todolist
 {
-    public class Todo
+    public class Todo // Klass ToDo - Här defineras allting...
     {
         public static List<TodoItem> list = new List<TodoItem>();
 
