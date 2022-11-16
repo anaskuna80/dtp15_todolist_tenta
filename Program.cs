@@ -1,5 +1,36 @@
 ﻿namespace dtp15_todolist
 {
+    class MyIO // Initiering av klassen MyIO
+    {
+        static public string ReadCommand(string prompt) // Inläsning av kommandon
+        {
+            Console.Write(prompt);
+            return Console.ReadLine(); // Här sker inläsning
+        }
+        static public bool Equals(string rawCommand, string expected) // Metoden Equals jämför inmatningen och kollar om det är initierat i programmet
+        {
+            string command = rawCommand.Trim(); // Städa upp kommando
+            if (command == "") return false; // Om commando är tom så returnera false
+            else
+            {
+                string[] cwords = command.Split(' '); // Annars dela upp strängen av det inmatna kommandot med mellanslag
+                if (cwords[0] == expected) return true; // Om första kommandot är det samma som väntas returnera true
+            }
+            return false; // ... annars false
+        }
+        static public bool HasArgument(string rawCommand, string expected) // Denna metod kollar om det finns fler argument än ett i inmatning.
+        {
+            string command = rawCommand.Trim(); // Ta bort onödiga mellanslag
+            if (command == "") return false;
+            else
+            {
+                string[] cwords = command.Split(' '); // Dela upp inmatna sträng till en array med mellanslag
+                if (cwords.Length < 2) return false; // Om det bara blir ett ord av inmatningen så returnera false
+                if (cwords[1] == expected) return true; // Annars sant
+            }
+            return false;
+        }
+    }
     public class Todo // Klass ToDo - Definering av status per uppgift
     {
         public static List<TodoItem> list = new List<TodoItem>(); // Skapande av listan list.
@@ -70,12 +101,12 @@
         {
             if (head)
             {
-                Console.Write("|status      |prio  |namn                     |");
-                if (verbose) Console.WriteLine("beskrivning                             |");
-                else Console.WriteLine();
+               Console.Write("|status      |prio  |namn                     |");
+               if (verbose) Console.WriteLine("beskrivning                             |");
+               else Console.WriteLine();
             }
             Console.Write("|------------|------|-------------------------|");
-            if (verbose) Console.WriteLine("---------------------------------------------|");
+            if (verbose) Console.WriteLine("----------------------------------------|");
             else Console.WriteLine();
         }
         private static void PrintHead(bool verbose) // Metod två kallar på ovanstående metod och sätter head som sann
@@ -138,35 +169,5 @@
             while (true); // Kör loopen medans sant
         }
     }
-    class MyIO // Initiering av klassen MyIO
-    {
-        static public string ReadCommand(string prompt) // Inläsning av kommandon
-        {
-            Console.Write(prompt);
-            return Console.ReadLine(); // Här sker inläsning
-        }
-        static public bool Equals(string rawCommand, string expected) // Metoden Equals jämför inmatningen och kollar om det är initierat i programmet
-        {
-            string command = rawCommand.Trim(); // Städa upp kommando
-            if (command == "") return false; // Om commando är tom så returnera false
-            else
-            {
-                string[] cwords = command.Split(' '); // Annars dela upp strängen av det inmatna kommandot med mellanslag
-                if (cwords[0] == expected) return true; // Om första kommandot är det samma som väntas returnera true
-            }
-            return false; // ... annars false
-        }
-        static public bool HasArgument(string rawCommand, string expected) // Denna metod kollar om det finns fler argument än ett i inmatning.
-        {
-            string command = rawCommand.Trim(); // Ta bort onödiga mellanslag
-            if (command == "") return false;
-            else
-            {
-                string[] cwords = command.Split(' '); // Dela upp inmatna sträng till en array med mellanslag
-                if (cwords.Length < 2) return false; // Om det bara blir ett ord av inmatningen så returnera false
-                if (cwords[1] == expected) return true; // Annars sant
-            }
-            return false;
-        }
-    }
+   
 }
