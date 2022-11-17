@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using static dtp15_todolist.Todo;
 
 namespace dtp15_todolist
 {
@@ -50,26 +52,29 @@ namespace dtp15_todolist
                 default: return "(felaktig)";
             }        
         }
-        public static void StatusChanger(string changeTask)
+        public static void StatusChanger(string command, string changeTask)
         {
-            if (changeTask == "vänta" && changeTask == "klar")
+            changeTask.Trim();
+            Console.WriteLine(changeTask);
+            if (command == "vänta" || command == "klar")
+            {
                 foreach (TodoItem item in list)
-                    if (item.task == changeTask)
-                        item.status = Active;
-                    else
-                        Console.WriteLine($"{changeTask} är redan {item.status}!");
-            else if (changeTask == "aktiv" && changeTask == "klar")
+                    if (item.task == changeTask) { item.status = Active; Console.WriteLine($"{item.task} är nu {item.status}"); }
+                    else { Console.WriteLine($"{changeTask} är redan {item.status}!"); }
+            }
+            else if (changeTask == "aktiv" || changeTask == "klar")
                 foreach (TodoItem item in list)
                     if (item.task == changeTask)
                         item.status = Waiting;
                     else
                         Console.WriteLine($"{changeTask} är redan {item.status}!");
-            else if (changeTask == "aktiv" && changeTask == "vänta")
+            else if (changeTask == "aktiv" || changeTask == "vänta")
                 foreach (TodoItem item in list)
                     if (item.task == changeTask)
                         item.status = Ready;
                     else
                         Console.WriteLine($"{changeTask} är redan {item.status}!");
+            else { Console.WriteLine("Fel!"); }
         }
 
 
@@ -207,23 +212,27 @@ namespace dtp15_todolist
                 }
                 else if (MyIO.Equals(command, "sluta")) // Annars om command är sluta så skriv ut ett hejdå dör att hoppa ur loop.
                 {
+                    string saveFile = "todo2.lis";
+                    int lines = 0;
+                    
+                    using (TextWriter swr = new StreamWriter(saveFile))
+                    {
+                        for (int s = 0; s < list.Count; s++)
+                        {
+                            string line = $"{list[s].status}|{list[s].priority}|{list[s].task}|{list[s].taskDescription}";
+                            swr.WriteLine(line);
+                            lines++;
+                        }
+                        Console.WriteLine($"Sparar {lines} rader i {saveFile}");
+                    }
+                    Console.ReadKey();
                     Console.WriteLine("Hej då!");
+
                     break;
                 }
-                else if (MyIO.Equals(command, "ny"))
-                {
-                    Todo.TodoItem.NewTask();
-                   /* int nyprio;
-                    string? nytask, nyinfo;
-                    Console.Write("\n Vad är det för uppgift du vill lägga till? -> ");
-                    nytask = Console.ReadLine();
-                    Console.WriteLine("Kan ge en kort beskrivning av uppgiften? -> ");
-                    nyinfo = Console.ReadLine();
-                    Console.Write($"Vilket prio vill du sätta på {nytask}? (Ange 1-3) >");
-                    nyprio = Int32.Parse(Console.ReadLine());
-                    Todo.TodoItem item = new Todo.TodoItem(nyprio, nytask, nyinfo);
-                    Todo.list.Add(item);      */            
-                }
+
+                else if (MyIO.Equals(command, "ny")) { Todo.TodoItem.NewTask(); }
+
                 else if (MyIO.Equals(command, "exit") || MyIO.Equals(command, "quit") || MyIO.Equals(command, "avsluta"))
                 {
                     Console.WriteLine("För att avsluta detta lilla program skriv \"sluta\"");
@@ -240,32 +249,34 @@ namespace dtp15_todolist
                         Todo.PrintTodoList(verbose: false); // Annars ska inte beskrivning bli utskriven men bara det nödvändigaste.
                 }
                 else if (MyIO.Equals(command, "beskriv")) //beskriv
-                {          
+                {
                     Todo.PrintTodoList(verbose: true);
                     Console.WriteLine("Skriv hjälp för hjälp...");
                 }
                 else if (command.StartsWith("aktivera"))
-                {
-                    string check = command;
-                    command.Split(" ");
-                    check = command[9..];
-
-                    Todo.TodoItem verify = new Todo.TodoItem(check);
-                    Console.WriteLine($"{check}");
-
-                    if (verify.status != 1)
-                        verify.status = 1;
-                    else { Console.WriteLine($"{verify.task} är redan aktiv!"); }
-                } 
-                else if (MyIO.Equals(command, "klar"))
-                {
-                    Todo.PrintTodoList(verbose: true);
-                    Console.WriteLine("Skriv hjälp för hjälp...");
+                {                 
+                    string[] commands = command.Split(" ");
+                    string check = command[9..];
+                    Todo.StatusChanger(commands[0], check);
                 }
-                else if (MyIO.Equals(command, "vänta"))
+                else if (MyIO.Equals(command[0], "-klar"))
                 {
-                    Todo.PrintTodoList(verbose: true);
-                    Console.WriteLine("Skriv hjälp för hjälp...");
+                    string[] commands = command.Split(" ");
+                    foreach (TodoItem item in list)
+                        if (item.task == commands[1])
+                            item.status = Ready;
+                }
+                else if (command.StartsWith("klar"))
+                {            
+                    string[] commands = command.Split(" ");
+                    string check = command[5..];
+                    Todo.StatusChanger(commands[0], check);
+                }
+                else if (command.StartsWith("vänta"))
+                {
+                    string[] commands = command.Split(" ");
+                    string check = command[4..];
+                    Todo.StatusChanger(commands[0], check);
                 }
                 else // Annars meddelas användaren att han/hon har skrivit in ett felaktigt kommando.
                 {
