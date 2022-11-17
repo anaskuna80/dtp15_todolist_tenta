@@ -1,4 +1,6 @@
-﻿namespace dtp15_todolist
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace dtp15_todolist
 {
     class MyIO // Initiering av klassen MyIO
     {
@@ -46,8 +48,31 @@
                 case Waiting: return "väntande";
                 case Ready: return "avklarad";
                 default: return "(felaktig)";
-            }
+            }        
         }
+        public static void StatusChanger(string changeTask)
+        {
+            if (changeTask == "vänta" && changeTask == "klar")
+                foreach (TodoItem item in list)
+                    if (item.task == changeTask)
+                        item.status = Active;
+                    else
+                        Console.WriteLine($"{changeTask} är redan {item.status}!");
+            else if (changeTask == "aktiv" && changeTask == "klar")
+                foreach (TodoItem item in list)
+                    if (item.task == changeTask)
+                        item.status = Waiting;
+                    else
+                        Console.WriteLine($"{changeTask} är redan {item.status}!");
+            else if (changeTask == "aktiv" && changeTask == "vänta")
+                foreach (TodoItem item in list)
+                    if (item.task == changeTask)
+                        item.status = Ready;
+                    else
+                        Console.WriteLine($"{changeTask} är redan {item.status}!");
+        }
+
+
         public class TodoItem // Klass för att dela upp varje rad i [filnamn] i 4 delar med hjälp av "|".
         {
             public int status; // Först initiering av två int (status och priority) och två strängar (task och taskDesctiption)
@@ -64,8 +89,8 @@
             public TodoItem(string todoLine) // Konstruktor för skapande av array för uppdelning i fyra "fält" av inläst fil.
             {
                 string[] field = todoLine.Split('|'); // Dela allt i array/strängen "field" vid varje pipe
-                status = Int32.Parse(field[0]); // status har index 0
-                priority = Int32.Parse(field[1]); // priority har index 1
+                status = int.Parse(field[0]); // status har index 0
+                priority = int.Parse(field[1]); // priority har index 1
                 task = field[2]; // task har index 2
                 taskDescription = field[3]; // taskDescription har index 3 av max 4 (0-3)
             }
@@ -77,6 +102,19 @@
                     Console.WriteLine($"{taskDescription,-40}|"); //...skriv ut hela uppgiftens beskriving.
                 else
                     Console.WriteLine(); // eller skriv en tom rad.
+            }
+            public static void NewTask()
+            {
+                int nyprio;
+                string? nytask, nyinfo;
+                Console.Write("\n Vad är det för uppgift du vill lägga till? -> ");
+                nytask = Console.ReadLine();
+                Console.WriteLine("Kan ge en kort beskrivning av uppgiften? -> ");
+                nyinfo = Console.ReadLine();
+                Console.Write($"Vilket prio vill du sätta på {nytask}? (Ange 1-3) >");
+                nyprio = Int32.Parse(Console.ReadLine());
+                Todo.TodoItem item = new Todo.TodoItem(nyprio, nytask, nyinfo);
+                Todo.list.Add(item);
             }
         }
         public static void ReadListFromFile() // Metod för inläsning av fil användande av StreamReader.
@@ -142,8 +180,8 @@
             Console.WriteLine(" |       \"hjälp\"        :  Visa denna hjälp.                            YEAH! |");
             Console.WriteLine(" |       \"lista\"        :  Lista att-göra-listan.                         OK! |");
             Console.WriteLine(" |     \"lista allt\"     :  Lista allt aktivt i att-göra-listan.          TBD! |");
-            Console.WriteLine(" |       \"beskriv\"      :  Lista precis allt i att-göra-listan.          NYI! |");
-            Console.WriteLine(" |         \"ny\"         :  Skapa ny uppgift i att-göra-listan.           NYI! |");
+            Console.WriteLine(" |       \"beskriv\"      :  Lista precis allt i att-göra-listan.           OK! |");
+            Console.WriteLine(" |         \"ny\"         :  Skapa ny uppgift i att-göra-listan.            OK! |");
             Console.WriteLine(" | \"aktivera /uppgift/\" :  Göra vald uppgift aktiv i att-göra-listan.    NYI! |");
             Console.WriteLine(" |     \"klar /uppgift/\" :  Göra vald uppgift avklarad i att-göra-listan. NYI! |");
             Console.WriteLine(" |    \"vänta /uppgift/\" :  Göra vald uppgift väntande i att-göra-listan. NYI! |");
@@ -174,26 +212,17 @@
                 }
                 else if (MyIO.Equals(command, "ny"))
                 {
-                    int status = 1;
-                    string nyprio, nytask, nyinfo;
-                    List<string> newtask = new List<string>();
+                    Todo.TodoItem.NewTask();
+                   /* int nyprio;
+                    string? nytask, nyinfo;
                     Console.Write("\n Vad är det för uppgift du vill lägga till? -> ");
                     nytask = Console.ReadLine();
-                    if (nytask.Length <= 2) { Console.WriteLine($"{nytask} tillagd"); }
-                    else { Console.WriteLine("Uppgift för kort!"); }
                     Console.WriteLine("Kan ge en kort beskrivning av uppgiften? -> ");
                     nyinfo = Console.ReadLine();
                     Console.Write($"Vilket prio vill du sätta på {nytask}? (Ange 1-3) >");
-                    nyprio = Console.ReadLine();
-                    if (nyprio == "0" || nyprio == "4") { Console.WriteLine("Denna prio finns inte!"); }
-                    else if (nyprio == "1") { newtask.Add(nyprio); }
-                    else if (nyprio == "2") { newtask.Add(nyprio); }
-                    else if (nyprio == "3") { newtask.Add(nyprio); }
-                    else { Console.WriteLine("ERROR"); }
-                    newtask.Add(nytask);
-                    newtask.Add(nyinfo);
-                    Console.WriteLine(newtask[2]);
-                    break;
+                    nyprio = Int32.Parse(Console.ReadLine());
+                    Todo.TodoItem item = new Todo.TodoItem(nyprio, nytask, nyinfo);
+                    Todo.list.Add(item);      */            
                 }
                 else if (MyIO.Equals(command, "exit") || MyIO.Equals(command, "quit") || MyIO.Equals(command, "avsluta"))
                 {
@@ -209,6 +238,34 @@
                         Todo.PrintTodoList(verbose: true);
                     else
                         Todo.PrintTodoList(verbose: false); // Annars ska inte beskrivning bli utskriven men bara det nödvändigaste.
+                }
+                else if (MyIO.Equals(command, "beskriv")) //beskriv
+                {          
+                    Todo.PrintTodoList(verbose: true);
+                    Console.WriteLine("Skriv hjälp för hjälp...");
+                }
+                else if (command.StartsWith("aktivera"))
+                {
+                    string check = command;
+                    command.Split(" ");
+                    check = command[9..];
+
+                    Todo.TodoItem verify = new Todo.TodoItem(check);
+                    Console.WriteLine($"{check}");
+
+                    if (verify.status != 1)
+                        verify.status = 1;
+                    else { Console.WriteLine($"{verify.task} är redan aktiv!"); }
+                } 
+                else if (MyIO.Equals(command, "klar"))
+                {
+                    Todo.PrintTodoList(verbose: true);
+                    Console.WriteLine("Skriv hjälp för hjälp...");
+                }
+                else if (MyIO.Equals(command, "vänta"))
+                {
+                    Todo.PrintTodoList(verbose: true);
+                    Console.WriteLine("Skriv hjälp för hjälp...");
                 }
                 else // Annars meddelas användaren att han/hon har skrivit in ett felaktigt kommando.
                 {
