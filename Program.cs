@@ -189,10 +189,10 @@
                     else if (nyprio == "1") { newtask.Add(nyprio); }
                     else if (nyprio == "2") { newtask.Add(nyprio); }
                     else if (nyprio == "3") { newtask.Add(nyprio); }
-                    else throw new OutOfMemoryException();
+                    else { Console.WriteLine("ERROR"); }
                     newtask.Add(nytask);
                     newtask.Add(nyinfo);
-                    Console.WriteLine(newtask);
+                    Console.WriteLine(newtask[2]);
                     break;
                 }
                 else if (MyIO.Equals(command, "exit") || MyIO.Equals(command, "quit") || MyIO.Equals(command, "avsluta"))
