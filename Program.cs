@@ -50,92 +50,108 @@ namespace dtp15_todolist
                 case Waiting: return "väntande";
                 case Ready: return "avklarad";
                 default: return "(felaktig)";
-            }        
+            }
         }
         public static void StatusChanger(string command, string changeTask)
         {
             changeTask.Trim();
-            Console.WriteLine(changeTask);
-            if (command == "vänta" || command == "klar")
+
+            if (command == "klar")
             {
                 foreach (TodoItem item in list)
-                    if (item.task == changeTask) { item.status = Active; Console.WriteLine($"{item.task} är nu {item.status}"); }
-                    else { Console.WriteLine($"{changeTask} är redan {item.status}!"); }
+                    if (item.task == changeTask) { item.status = Ready; Console.WriteLine($"{item.task} har nu status AVKLARAD"); break; }
             }
-            else if (changeTask == "aktiv" || changeTask == "klar")
+            else if (command == "aktivera")
+            {
                 foreach (TodoItem item in list)
-                    if (item.task == changeTask)
-                        item.status = Waiting;
-                    else
-                        Console.WriteLine($"{changeTask} är redan {item.status}!");
-            else if (changeTask == "aktiv" || changeTask == "vänta")
+                    if (item.task == changeTask) { item.status = Active; Console.WriteLine($"{item.task} har nu status AKTIV"); break; }
+            }
+            else if (command == "vänta")
+            {
                 foreach (TodoItem item in list)
-                    if (item.task == changeTask)
-                        item.status = Ready;
-                    else
-                        Console.WriteLine($"{changeTask} är redan {item.status}!");
-            else { Console.WriteLine("Fel!"); }
+                    if (item.task == changeTask) { item.status = Waiting; Console.WriteLine($"{item.task} har nu status VÄNTANDE"); break; }
+            }
+            else { Console.WriteLine($"Fel! {command} {changeTask} är ett felaktigt kommando"); }
         }
 
-
-        public class TodoItem // Klass för att dela upp varje rad i [filnamn] i 4 delar med hjälp av "|".
+        public class TodoItem 
         {
-            public int status; // Först initiering av två int (status och priority) och två strängar (task och taskDesctiption)
+            public int status;
             public int priority;
             public string task;
             public string taskDescription;
-            public TodoItem(int priority, string task, string taskInfo) // Konstruktor för skapande av nya poster
+            public TodoItem(int priority, string task, string taskInfo) 
             {
                 this.status = Active;
                 this.priority = priority;
                 this.task = task;
                 this.taskDescription = taskInfo;
             }
-            public TodoItem(string todoLine) // Konstruktor för skapande av array för uppdelning i fyra "fält" av inläst fil.
+            public TodoItem(string todoLine) 
             {
-                string[] field = todoLine.Split('|'); // Dela allt i array/strängen "field" vid varje pipe
-                status = int.Parse(field[0]); // status har index 0
-                priority = int.Parse(field[1]); // priority har index 1
-                task = field[2]; // task har index 2
-                taskDescription = field[3]; // taskDescription har index 3 av max 4 (0-3)
+                string[] field = todoLine.Split('|'); 
+                status = int.Parse(field[0]); 
+                priority = int.Parse(field[1]); 
+                task = field[2];
+                taskDescription = field[3]; 
             }
-            public void Print(bool verbose = false) // Metoden Print som har variabeln verbose(=mångordig) satt till false som default.
+            public void Print(bool verbose = false) 
             {
                 string statusString = StatusToString(status);
-                Console.Write($"|{statusString,-12}|{priority,-6}|{task,-25}|"); // utskrift av task
-                if (verbose) // om verbose är sann så...
-                    Console.WriteLine($"{taskDescription,-40}|"); //...skriv ut hela uppgiftens beskriving.
+                Console.Write($"|{statusString,-12}|{priority,-6}|{task,-25}|"); 
+                if (verbose) 
+                    Console.WriteLine($"{taskDescription,-40}|"); 
                 else
-                    Console.WriteLine(); // eller skriv en tom rad.
+                    Console.WriteLine();
             }
-            public static void NewTask()
+            public static void SaveFile()
             {
-                int nyprio;
-                string? nytask, nyinfo;
-                Console.Write("\n Vad är det för uppgift du vill lägga till? -> ");
-                nytask = Console.ReadLine();
-                Console.WriteLine("Kan ge en kort beskrivning av uppgiften? -> ");
-                nyinfo = Console.ReadLine();
-                Console.Write($"Vilket prio vill du sätta på {nytask}? (Ange 1-3) >");
-                nyprio = Int32.Parse(Console.ReadLine());
-                Todo.TodoItem item = new Todo.TodoItem(nyprio, nytask, nyinfo);
-                Todo.list.Add(item);
+                string saveFile = "todo2.lis";
+                int lines = 0;
+                using (TextWriter swr = new StreamWriter(saveFile))
+                {
+                    for (int s = 0; s < list.Count; s++)
+                    {
+                        string line = $"{list[s].status}|{list[s].priority}|{list[s].task}|{list[s].taskDescription}";
+                        swr.WriteLine(line);
+                        lines++;
+                    }
+                }             
+                Console.Write($" Sparade {lines} rader i ");
+                Console.BackgroundColor = ConsoleColor.DarkRed;
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($"{saveFile}\n"); 
+                Console.ResetColor();
             }
         }
+        public static void NewTask()
+        {
+            int nyprio;
+            string? nytask, nyinfo;
+            Console.Write("\n Vad är det för uppgift du vill lägga till? -> ");
+            nytask = Console.ReadLine();
+            Console.Write($"\nKan ge en kort beskrivning av uppgiften? -> ");
+            nyinfo = Console.ReadLine();
+            Console.Write($"Vilket prio vill du sätta på {nytask}? (Ange 1-3) >");
+            nyprio = Int32.Parse(Console.ReadLine());
+            Todo.TodoItem item = new Todo.TodoItem(nyprio, nytask, nyinfo);
+            Todo.list.Add(item);
+        }
+    
         public static void ReadListFromFile() // Metod för inläsning av fil användande av StreamReader.
         {
             string todoFileName = "todo.lis"; // Hårdkodning av att använda filen todo.lis -- TBD
-            Console.Write($" Läser från fil "); 
-            Console.BackgroundColor = ConsoleColor.DarkRed; 
+            Console.Write($" Läser från fil ");
+            Console.BackgroundColor = ConsoleColor.DarkRed;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.Write(todoFileName); // Talar om för användaren att filen är inläst.
             Console.ResetColor();
             Console.Write("."); Thread.Sleep(500);
-            Console.Write("."); Thread.Sleep(500); 
             Console.Write("."); Thread.Sleep(500);
             Console.Write("."); Thread.Sleep(500);
             Console.Write("."); Thread.Sleep(500);
-            StreamReader sr = new StreamReader(todoFileName); // Men det är inte gjort förrän här.
+            Console.Write("."); Thread.Sleep(500);
+            StreamReader sr = new StreamReader(todoFileName); 
             int numRead = 0;
 
             string line;
@@ -145,17 +161,17 @@ namespace dtp15_todolist
                 list.Add(item); // Lägg till detta i listan list.
                 numRead++;
             }
-            sr.Close(); // Stäng fil
-            Console.WriteLine($" Läste {numRead} rader.\n"); // Talar om hur många rader filen bestod av.
+            sr.Close(); 
+            Console.WriteLine($" Läste {numRead} rader.\n"); 
         }
-        // Nu följer tre privata metoder för utskrift av data från inläst fil:
-        private static void PrintHeadOrFoot(bool head, bool verbose) // Första privata metoden initierar printhuvud och fot för mall till utskrift.
+
+        private static void PrintHeadOrFoot(bool head, bool verbose) 
         {
             if (head)
             {
-               Console.Write("|status      |prio  |namn                     |");
-               if (verbose) Console.WriteLine("beskrivning                             |");
-               else Console.WriteLine();
+                Console.Write("|status      |prio  |namn                     |");
+                if (verbose) Console.WriteLine("beskrivning                             |");
+                else Console.WriteLine();
             }
             Console.Write("|------------|------|-------------------------|");
             if (verbose) Console.WriteLine("----------------------------------------|");
@@ -178,88 +194,64 @@ namespace dtp15_todolist
             }
             PrintFoot(verbose);
         }
+     
         public static void PrintHelp() // Hjälplista NYI -- Lägg till flera valmöjligheter
         {
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(" +----------------------------------------------------------------------------+");
             Console.WriteLine(" | Kommandon:                                                                 |\n +----------------------------------------------------------------------------+");
             Console.WriteLine(" |       \"hjälp\"        :  Visa denna hjälp.                            YEAH! |");
             Console.WriteLine(" |       \"lista\"        :  Lista att-göra-listan.                         OK! |");
-            Console.WriteLine(" |     \"lista allt\"     :  Lista allt aktivt i att-göra-listan.          TBD! |");
+            Console.WriteLine(" |     \"lista allt\"     :  Lista allt aktivt i att-göra-listan.           OK! |");
             Console.WriteLine(" |       \"beskriv\"      :  Lista precis allt i att-göra-listan.           OK! |");
             Console.WriteLine(" |         \"ny\"         :  Skapa ny uppgift i att-göra-listan.            OK! |");
-            Console.WriteLine(" | \"aktivera /uppgift/\" :  Göra vald uppgift aktiv i att-göra-listan.    NYI! |");
-            Console.WriteLine(" |     \"klar /uppgift/\" :  Göra vald uppgift avklarad i att-göra-listan. NYI! |");
+            Console.WriteLine(" | \"aktivera /uppgift/\" :  Göra vald uppgift aktiv i att-göra-listan.     OK! |");
+            Console.WriteLine(" |     \"klar /uppgift/\" :  Göra vald uppgift avklarad i att-göra-listan.  OK! |");
             Console.WriteLine(" |    \"vänta /uppgift/\" :  Göra vald uppgift väntande i att-göra-listan. NYI! |");
-            Console.WriteLine(" |        \"sluta\"       :  Spara att-göra-listan och avsluta programmet. TBD! |");
+            Console.WriteLine(" |        \"sluta\"       :  Spara att-göra-listan och avsluta programmet.  OK! |");
             Console.WriteLine(" +----------------------------------------------------------------------------+");
-        }
+            Console.ResetColor();
+        } 
     }
     class MainClass
     {
-        public static void Main(string[] args) // Huvudprogram.
+        public static void Main(string[] args) 
         {
-            Console.WriteLine(" Välkommen till att-göra-listan!"); // Hälsar användaren välkommen.
+            Console.WriteLine(" Välkommen till att-göra-listan!"); 
             Console.WriteLine(" -------------------------------\n");
-            Todo.ReadListFromFile(); // Inläsning av fil, kallar på den funktionen i klassen Todo.
-            Todo.PrintHelp(); // Utskrift av meny/hjälp, kallar på den funktionen i klassen Todo.
-            string command; // initiering av en sträng som "behållare" för användarens inmatning
-            do // Startar Loop
+            ReadListFromFile(); 
+            PrintHelp();
+            string command; 
+            do 
             {
                 command = MyIO.ReadCommand("> "); // Kallar på metoden ReadCommand i klassen MyIO för att be användaren om inmatning.
-                if (MyIO.Equals(command, "hjälp")) // Start av If sats... Om command är hjälp så skriv ut menyn en gång till. NYI... Fler else if.
-                {
-                    Todo.PrintHelp(); // Utskrift av meny/hjälp.
-                }
-                else if (MyIO.Equals(command, "sluta")) // Annars om command är sluta så skriv ut ett hejdå dör att hoppa ur loop.
-                {
-                    string saveFile = "todo2.lis";
-                    int lines = 0;
-                    
-                    using (TextWriter swr = new StreamWriter(saveFile))
-                    {
-                        for (int s = 0; s < list.Count; s++)
-                        {
-                            string line = $"{list[s].status}|{list[s].priority}|{list[s].task}|{list[s].taskDescription}";
-                            swr.WriteLine(line);
-                            lines++;
-                        }
-                        Console.WriteLine($"Sparar {lines} rader i {saveFile}");
-                    }
-                    Console.ReadKey();
-                    Console.WriteLine("Hej då!");
 
-                    break;
-                }
+                if (MyIO.Equals(command, "hjälp")) { PrintHelp(); }
 
-                else if (MyIO.Equals(command, "ny")) { Todo.TodoItem.NewTask(); }
+                else if (MyIO.Equals(command, "sluta")) { TodoItem.SaveFile(); Console.WriteLine(" Hej då!"); break; }
+
+                else if (MyIO.Equals(command, "ny")) { NewTask(); }
 
                 else if (MyIO.Equals(command, "exit") || MyIO.Equals(command, "quit") || MyIO.Equals(command, "avsluta"))
-                {
-                    Console.WriteLine("För att avsluta detta lilla program skriv \"sluta\"");
-                }
-                else if (MyIO.Equals(command, "authors") || MyIO.Equals(command, "programmerad") || MyIO.Equals(command, "cred"))
-                {
-                    Console.WriteLine("Programmet är skriven av TomKi the teacher och Andreas Kuylenstierna");
-                }
+                { Console.WriteLine(" För att avsluta detta lilla program skriv: \"sluta\""); }
+  
                 else if (MyIO.Equals(command, "lista")) // Annars om command är lista så... en ny if sats startar:
                 {
-                    if (MyIO.HasArgument(command, "allt")) // Om command innehåller "lista" + allt så ska beskrivning inkluderas i utskrift
-                        Todo.PrintTodoList(verbose: true);
-                    else
-                        Todo.PrintTodoList(verbose: false); // Annars ska inte beskrivning bli utskriven men bara det nödvändigaste.
+                    // (MyIO.HasArgument(command, "allt")) // Sparat på skoj
+                    // Todo.PrintTodoList(verbose: true);                 
+                    PrintTodoList(verbose: false);
                 }
-                else if (MyIO.Equals(command, "beskriv")) //beskriv
-                {
-                    Todo.PrintTodoList(verbose: true);
-                    Console.WriteLine("Skriv hjälp för hjälp...");
-                }
+
+                else if (MyIO.Equals(command, "beskriv")) { PrintTodoList(verbose: true); Console.WriteLine("Skriv hjälp för hjälp..."); }
+
                 else if (command.StartsWith("aktivera"))
-                {                 
+                {
                     string[] commands = command.Split(" ");
                     string check = command[9..];
-                    Todo.StatusChanger(commands[0], check);
+                    StatusChanger(commands[0], check);
                 }
-                else if (MyIO.Equals(command[0], "-klar"))
+                else if (Equals(command[0], "klara"))
                 {
                     string[] commands = command.Split(" ");
                     foreach (TodoItem item in list)
@@ -267,20 +259,22 @@ namespace dtp15_todolist
                             item.status = Ready;
                 }
                 else if (command.StartsWith("klar"))
-                {            
+                {
+                   
                     string[] commands = command.Split(" ");
                     string check = command[5..];
-                    Todo.StatusChanger(commands[0], check);
+                    Console.WriteLine(check);
+                    StatusChanger(commands[0], check);
                 }
                 else if (command.StartsWith("vänta"))
                 {
                     string[] commands = command.Split(" ");
                     string check = command[4..];
-                    Todo.StatusChanger(commands[0], check);
+                    StatusChanger(commands[0], check);
                 }
                 else // Annars meddelas användaren att han/hon har skrivit in ett felaktigt kommando.
                 {
-                    Console.WriteLine($"Okänt/ogiltigt kommando: \"{command}\"");
+                    Console.WriteLine($" Okänt/ogiltigt kommando: \"{command}\"");
                 }
             }
             while (true); // Kör loopen medans sant
