@@ -187,7 +187,7 @@ namespace dtp15_todolist
                 {
                     list.Clear();
                     StreamReader sr = new StreamReader(todoFileName);
-                    Console.WriteLine($" Läser från fil ");
+                    Console.Write($" Läser från fil ");
                     Console.BackgroundColor = ConsoleColor.DarkRed;
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write(todoFileName);
@@ -269,6 +269,7 @@ namespace dtp15_todolist
             Console.WriteLine(" |       \"lista\"        :  Lista att-göra-listan.                         OK! |");
             Console.WriteLine(" |     \"lista allt\"     :  Lista allt aktivt i att-göra-listan.           OK! |");
             Console.WriteLine(" |       \"beskriv\"      :  Lista precis allt i att-göra-listan.           OK! |");
+            Console.WriteLine(" |    \"beskriv allt\"    :  Lista precis allt i att-göra-listan.           OK! |");
             Console.WriteLine(" |         \"ny\"         :  Skapa ny uppgift i att-göra-listan.            OK! |");
             Console.WriteLine(" | \"aktivera /uppgift/\" :  Göra vald uppgift aktiv i att-göra-listan.     OK! |");
             Console.WriteLine(" |     \"klar /uppgift/\" :  Göra vald uppgift avklarad i att-göra-listan.  OK! |");
@@ -302,7 +303,12 @@ namespace dtp15_todolist
                     else { Console.WriteLine("Något gick tyvärr fel..."); }
                 }
 
-                else if (MyIO.Equals(command, "beskriv")) { PrintTodoList(verbose: true); }
+                else if (MyIO.Equals(command, "beskriv")) 
+                {
+                    if (command.Contains("allt")) PrintTodoList(verbose: true);
+                    else if (command.Contains("")) { PrintActiveList(verbose: true); }
+                    else { Console.WriteLine("Något gick tyvärr fel..."); }
+                }
 
                 else if (MyIO.Equals(command, "ny")) { NewTask(); }
 
