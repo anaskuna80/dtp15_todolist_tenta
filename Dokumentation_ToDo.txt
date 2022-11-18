@@ -6,6 +6,8 @@
 * "aktivera /uppgift/" 	- Sätt status på aktuell uppgift till aktiv (Active). [KLART]
 * "klar /uppgift/"	- Sätt status på aktuell uppgift till redo (Ready). [KLART]
 * "vänta /uppgift/" 	- Sätt status på aktuell uppgift till väntande (Waiting). [KLART]
+* "ladda"		- Ladda in valbar fil med lista att läsa in. [KLART]
+* "spara"		- En funktion för att spara listan. [KLART]
 
 // Funktioner att uppdatera:
 
@@ -17,13 +19,16 @@
 * Utöver medföljande ToDo.lis så ska egen göras, antingen med samma namn eller eget namn. [KLART]
 * Programmet ska först få kommentarer innan något implementeras/ändras. [KLART]
 * När kommentarer är tillagda och programmet är kartlagt är det dags att börja lägga till funktionerna ovan. [KLART]
+(Kommentar: Kommentarer las till från början men togs sedan bort.)
 	+ Börja med "beskriv" för att sedan dessutom rätta till funktionerna som ska uppdateras. [KLART]
 	+ Lägger sedan till "aktivera", "klar", och "vänta". [KLART]
-	+ Lägger till "ny". [KLART]
+	+ Lägga till "ny". [KLART]
+	+ Lägga till "beskriv" och "beskriv allt". [KLART]
+	+ Har ändrat/lagt till "lista" och "lista allt". [KLART]
+	+ Lagt till en "spara" och "ladda". [KLART]
 * Samtliga funktioner finns nu i main() så är det dags att refaktorera till egna metoder/klasser. [KLART i hygglig mån]
 * När allt ovanstående är gjort så kan eventuellt vissa kosmetiska egenskaper läggas till. [KLART]
 	+ Snyggare meny. [KLART]
-* (Eventuellt något mer läggs till om tid finns.) [Fanns tid men valde enbart att lägga till så att programmet sparar fil vid avslut.]
 
 -- Vid inlämning så kan det absolut finnas mer att utveckla på programmet. 
 // Andreas Kuylenstierna, Nov 15-18 2022 i Norrköping.
