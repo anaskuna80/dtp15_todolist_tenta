@@ -113,7 +113,10 @@ namespace dtp15_todolist
             }
             public static void SaveFile()
             {
-                string saveFile = "todo.lis";
+                string saveFile = "";
+                Console.Write(" Vad ska filen heta? Filen kommer att få filändelsen .lis > ");
+                saveFile = Console.ReadLine();
+                saveFile = saveFile + ".lis";
                 int lines = 0;
                 using (TextWriter swr = new StreamWriter(saveFile))
                 {
@@ -163,14 +166,54 @@ namespace dtp15_todolist
             int numRead = 0;
 
             string line;
-            while ((line = sr.ReadLine()) != null) // Sålänge inläsning sr inte är null så...
+            while ((line = sr.ReadLine()) != null) 
             {
-                TodoItem item = new TodoItem(line); // ...skapa en ny rad av inläst fil
-                list.Add(item); // Lägg till detta i listan list.
+                TodoItem item = new TodoItem(line); 
+                list.Add(item); 
                 numRead++;
             }
             sr.Close(); 
             Console.WriteLine($" Läste {numRead} rader.\n"); 
+        }
+
+        public static void ReadNewListFromFile(string command) 
+        {           
+            string todoFileName = "";
+            Console.Write(" Vad heter filen? > ");
+            todoFileName = Console.ReadLine();
+            try
+            {
+                if (todoFileName != null)
+                {
+                    list.Clear();
+                    StreamReader sr = new StreamReader(todoFileName);
+                    Console.WriteLine($" Läser från fil ");
+                    Console.BackgroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(todoFileName);
+                    Console.ResetColor();
+                    Console.Write("."); Thread.Sleep(500);
+                    Console.Write("."); Thread.Sleep(500);
+                    Console.Write("."); Thread.Sleep(500);
+                    Console.Write("."); Thread.Sleep(500);
+                    Console.Write("."); Thread.Sleep(500);                   
+                    int numRead = 0;
+
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        TodoItem item = new TodoItem(line);
+                        list.Add(item);
+                        numRead++;
+                    }
+                    sr.Close();
+                    Console.WriteLine($" Läste {numRead} rader.\n");
+                }   
+                else { Console.WriteLine(" Eh va?"); }
+            }
+            catch (FileNotFoundException ex)
+            { Console.WriteLine($" Filen { todoFileName} finns inte: " + ex.Message); }
+            
         }
 
         private static void PrintHeadOrFoot(bool head, bool verbose) 
@@ -230,24 +273,26 @@ namespace dtp15_todolist
             Console.WriteLine(" | \"aktivera /uppgift/\" :  Göra vald uppgift aktiv i att-göra-listan.     OK! |");
             Console.WriteLine(" |     \"klar /uppgift/\" :  Göra vald uppgift avklarad i att-göra-listan.  OK! |");
             Console.WriteLine(" |    \"vänta /uppgift/\" :  Göra vald uppgift väntande i att-göra-listan.  OK! |");
-            Console.WriteLine(" |        \"sluta\"       :  Spara att-göra-listan och avsluta programmet.  OK! |");
+            Console.WriteLine(" |        \"ladda\"       :  Ladda en ny att-göra-lista                     OK! |");
+            Console.WriteLine(" |        \"spara\"       :  Spara att-göra-listan i ny fil.                OK! |");
+            Console.WriteLine(" |        \"sluta\"       :  Avsluta programmet.                            OK! |");
             Console.WriteLine(" +----------------------------------------------------------------------------+");
             Console.ResetColor();
         } 
     }
     class MainClass
     {
-        public static void Main(string[] args) 
+        public static void Main(string[] args)
         {
-            Console.WriteLine(" Välkommen till att-göra-listan!"); 
+            Console.WriteLine(" Välkommen till att-göra-listan!");
             Console.WriteLine(" -------------------------------\n");
-            ReadListFromFile(); 
+            ReadListFromFile();
             PrintHelp();
-            string command; 
-            do 
+            string command;
+            do
             {
                 command = MyIO.ReadCommand("> ");
-  
+
                 if (MyIO.Equals(command, "hjälp")) { Console.Clear(); PrintHelp(); Console.ResetColor(); }
 
                 else if (MyIO.Equals(command, "lista"))
@@ -259,7 +304,7 @@ namespace dtp15_todolist
 
                 else if (MyIO.Equals(command, "beskriv")) { PrintTodoList(verbose: true); }
 
-                else if (MyIO.Equals(command, "ny")) { NewTask(); }                                
+                else if (MyIO.Equals(command, "ny")) { NewTask(); }
 
                 else if (command.StartsWith("aktivera"))
                 {
@@ -269,7 +314,7 @@ namespace dtp15_todolist
                 }
 
                 else if (command.StartsWith("klar"))
-                {                   
+                {
                     string[] commands = command.Split(" ");
                     string check = command[5..];
                     StatusChanger(commands[0], check);
@@ -282,13 +327,18 @@ namespace dtp15_todolist
                     StatusChanger(commands[0], check);
                 }
 
-                else if (MyIO.Equals(command, "sluta")) { TodoItem.SaveFile(); Console.WriteLine(" Hej då!"); Console.ResetColor(); break; }
+                else if (MyIO.Equals(command, "sluta")) { Console.WriteLine(" Hej då!"); Console.ResetColor(); break; }
 
                 // La till detta för att retas lite med användaren :-)
                 else if (MyIO.Equals(command, "exit") || MyIO.Equals(command, "quit") || MyIO.Equals(command, "avsluta") || MyIO.Equals(command, "finito") || MyIO.Equals(command, "end"))
                 { Console.WriteLine(" För att avsluta detta lilla program skriv: \"sluta\""); }
 
-                else Console.WriteLine($" Okänt/ogiltigt kommando: \"{command}\"");              
+                 else if (MyIO.Equals(command, "ladda")) { ReadNewListFromFile(command); }
+
+                 else if (MyIO.Equals(command, "spara")) { TodoItem.SaveFile(); }
+
+                 else 
+                    Console.WriteLine($" Okänt/ogiltigt kommando: \"{command}\"");
             }
             while (command != "sluta");
         }
