@@ -1,0 +1,28 @@
+// Funktioner att lägga till:
+
+* "ny" 			- Skapa en ny uppgift på listan. [KLART]
+* "beskriv"		- Lista alla uppgifter som är aktiva och då visa status, prioritet, namn och beskrivning på dessa. [KLART]
+* "aktivera /uppgift/" 	- Sätt status på aktuell uppgift till aktiv (Active). [KLART]
+* "klar /uppgift/"	- Sätt status på aktuell uppgift till redo (Ready). [KLART]
+* "vänta /uppgift/" 	- Sätt status på aktuell uppgift till väntande (Waiting). [KLART]
+
+// Funktioner att uppdatera:
+
+* "lista"		- Lista alla aktiva uppgifter och då visa status, prioritet och namn på dem. [KLART]
+* "lista allt"		- Lista alla uppgifter oavsett status och då visa status, prioritet och namn på dem. [KLART]
+
+// Noteringar:
+
+* Utöver medföljande ToDo.lis så ska egen göras, antingen med samma namn eller eget namn. [KLART]
+* Programmet ska först få kommentarer innan något implementeras/ändras. [KLART]
+* När kommentarer är tillagda och programmet är kartlagt är det dags att börja lägga till funktionerna ovan. [KLART]
+	+ Börja med "beskriv" för att sedan dessutom rätta till funktionerna som ska uppdateras. [KLART]
+	+ Lägger sedan till "aktivera", "klar", och "vänta". [KLART]
+	+ Lägger till "ny". [KLART]
+* Samtliga funktioner finns nu i main() så är det dags att refaktorera till egna metoder/klasser. [KLART i hygglig mån]
+* När allt ovanstående är gjort så kan eventuellt vissa kosmetiska egenskaper läggas till. [KLART]
+	+ Snyggare meny. [KLART]
+* (Eventuellt något mer läggs till om tid finns.) [Fanns tid men valde enbart att lägga till så att programmet sparar fil vid avslut.]
+
+-- Vid inlämning så kan det absolut finnas mer att utveckla på programmet. 
+// Andreas Kuylenstierna, Nov 15-18 2022 i Norrköping.
